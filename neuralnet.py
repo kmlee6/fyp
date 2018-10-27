@@ -28,7 +28,7 @@ def discriminator(images, reuse_variables = None):
 
 		d6 = tf.reshape(d6, [-1, 4 * 4 * 512])
 		#fully connected layer to determine whether the image is real or fake
-		d7 = fully_connected(d6, 4 * 4 * 512, 1, 'real_fake')
+		d7 = fully_connected(d6, 4 * 4 * 512, 1, 'd7')
 		d7 = tf.nn.leaky_relu(d7)
 
         #fully connect layer to classify the image into the different styles
@@ -41,7 +41,7 @@ def discriminator(images, reuse_variables = None):
 		d9 = tf.nn.leaky_relu(alpha=0.2, d9)
 
 		#third fully connected layer
-		d10 = fully_connected(d6, 512, 3, 'classify')
+		d10 = fully_connected(d6, 512, 3, 'd10')
 		d10 = tf.nn.leaky_relu(d10)
 
 		return d7, d10
@@ -57,22 +57,22 @@ def generator(z):
 		g0 = tf.nn.relu(g0)
 
 		#fsconv1
-		g1 = fsconv2d(g0, [-1, 8, 8, 1024], 'fsconv1')
+		g1 = fsconv2d(g0, [-1, 8, 8, 1024], 'g1')
 		g1 = relu(g1)
 		#fsconv2
-		g2 = fsconv2d(g1, [-1, 16, 16, 512], 'fsconv2')
+		g2 = fsconv2d(g1, [-1, 16, 16, 512], 'g2')
 		g2 = relu(g2)
 		#fsconv3
-		g3 = fsconv2d(g2, [-1, 32, 32, 256], 'fsconv3')
+		g3 = fsconv2d(g2, [-1, 32, 32, 256], 'g3')
 		g3 = relu(g3)
 		#fsconv4
-		g4 = fsconv2d(g3, [-1, 64, 64, 128], 'fsconv4')
+		g4 = fsconv2d(g3, [-1, 64, 64, 128], 'g4')
 		g4 = relu(g4)
 		#fsconv5
-		g5 = fsconv2d(g4, [-1, 128, 128, 64], 'fsconv5')
+		g5 = fsconv2d(g4, [-1, 128, 128, 64], 'g5')
 		g5 = relu(g5)
 		#fsconv6
-		g6 = fsconv2d(g5, [-1, 256, 256, 3], 'fsconv6')
+		g6 = fsconv2d(g5, [-1, 256, 256, 3], 'g6')
 		g6 = relu(g6)
 
 		return tf.nn.tanh(g6)
