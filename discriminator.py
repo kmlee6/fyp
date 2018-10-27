@@ -48,7 +48,7 @@ def discriminator(images, reuse_variables = None):
 		d_w7 = tf.get_variable('d_w7', [4 * 4 *512, 1], initializer=tf.truncated_normal_initializer(stddev=0.02))
 		d_b7 = tf.get_variable('d_b7', [1], initializer=tf.constant_initializer(0))
 		d7 = tf.matmul(d6, d_w7) + d_b7
-		d7 = tf.nn.sigmoid(d7)
+		d7 = tf.nn.leaky_relu(d7)
 
         #fully connect layer to classify the image into the different styles
         #first fully connected layer
@@ -67,6 +67,6 @@ def discriminator(images, reuse_variables = None):
 		d_w10 = tf.get_variable('d_w10', [512, 3], initializer=tf.truncated_normal_initializer(stddev=0.02))
 		d_b10 = tf.get_variable('d_b10', [3], initializer=tf.constant_initializer(0))
 		d10 = tf.matmul(d9, d_w10) + d_b10
-		d10 = tf.nn.sigmoid(d10)
+		d10 = tf.nn.leaky_relu(d10)
 
 		return d7, d10
