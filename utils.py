@@ -1,12 +1,22 @@
+# Version log:
+# v1.0 initial version created.
+# v1.1 removed depreciated scipy.imread, added skimage, imageio to read input
+
+
 import os
 from glob import glob
-import scipy.misc
 import numpy as np
+import skimage
+import imageio
+
 
 def read_image(path):
-	image = scipy.misc.imread(path).astype(np.float)
-	cropped_image = scipy.misc.imresize(image, [256, 256])
-	return np.array(cropped_image)/127.5 - 1. #normalization
+	# removed in v1.1
+	# image = scipy.misc.imread(path).astype(np.float)
+	# cropped_image = scipy.misc.imresize(image, [256, 256])
+	image = imageio.imread(path, as_gray=False) 
+	cropped_image = skimage.transform.resize(image, (256,256),preserve_range=True)
+	return np.array(cropped_image)/127.5 - 1 #normalization
 
 ############# the functions below are exported #############
 
