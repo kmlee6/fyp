@@ -23,7 +23,6 @@ if __name__ == "__main__":
 	samples_path = get_images_path('./data', '*/*.jpg')
 	samples = get_images(samples_path)
 	samples_label = get_images_label(samples_path, style_dict)
-	
 
 	# define placeholder
 	x_placeholder = tf.placeholder(tf.float32, shape = [None,256,256,3], name='x_placeholder')
@@ -31,15 +30,14 @@ if __name__ == "__main__":
 
 	# define input for each model
 	generator = neuralnet.generator(z_placeholder)
-	discriminator_real = neuralnet.discriminator(x_placeholder)
-	discriminator_fake = neuralnet.discriminator(discriminator_real, reuse_variables = True)
+	discriminator_real, class_ = neuralnet.discriminator(x_placeholder)
+	discriminator_fake, class_ = neuralnet.discriminator(generator, reuse_variables = True)
 
 	# define loss functions
 	discriminator_loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = discriminator_real, labels = tf.ones_like(discriminator_real)))
 	discriminator_loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = discriminator_fake, labels = tf.zeros_like(discriminator_fake)))
 	generator_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = discriminator_fake, labels = tf.ones_like(discriminator_fake)))
 	
-
 	# define variable for the models
 	t_vars = tf.trainable_variables()
 	d_vars = [var for var in t_vars if 'discriminator' in var.name]

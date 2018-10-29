@@ -1,10 +1,10 @@
 from operations import *
 import tensorflow as tf
 
-def discriminator(images, reuse_variables = None):
+def discriminator(image, reuse_variables = None):
 	with tf.variable_scope("discriminator", reuse=reuse_variables) as scope:
 		#conv 1 (32 4x4 filters)
-		d1 = conv2d(images, [4, 4, 3, 32], 'd1')
+		d1 = conv2d(image, [4, 4, 3, 32], 'd1')
 		d1 = batch_norm(d1)
 		d1 = tf.nn.leaky_relu(alpha=0.2, features = d1)
 
@@ -19,7 +19,7 @@ def discriminator(images, reuse_variables = None):
 		d3 = tf.nn.leaky_relu(alpha=0.2, features =d3)
 
 		#conv 4 (256 4x4 filters)
-		d4 = conv2d(d3, [4, 4, 64, 126], 'd4')
+		d4 = conv2d(d3, [4, 4, 128, 256], 'd4')
 		d4 = batch_norm(d4)
 		d4 = tf.nn.leaky_relu(alpha=0.2, features =d4)
 
@@ -48,7 +48,7 @@ def discriminator(images, reuse_variables = None):
 		d9 = tf.nn.leaky_relu(alpha=0.2, features =d9)
 
 		#third fully connected layer
-		d10 = fully_connected(d6, 512, 3, 'd10')
+		d10 = fully_connected(d9, 512, 3, 'd10')
 		d10 = tf.nn.leaky_relu(features =d10)
 
 		return d7, d10

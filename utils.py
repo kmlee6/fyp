@@ -6,7 +6,7 @@
 import os
 from glob import glob
 import numpy as np
-import skimage
+from skimage import transform
 import imageio
 
 
@@ -15,7 +15,7 @@ def read_image(path):
 	# image = scipy.misc.imread(path).astype(np.float)
 	# cropped_image = scipy.misc.imresize(image, [256, 256])
 	image = imageio.imread(path, as_gray=False) 
-	cropped_image = skimage.transform.resize(image, (256,256),preserve_range=True)
+	cropped_image = transform.resize(image, (256,256),preserve_range=True)
 	return np.array(cropped_image)/127.5 - 1 #normalization
 
 ############# the functions below are exported #############

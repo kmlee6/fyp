@@ -52,7 +52,7 @@ def discriminator(images, reuse_variables = None):
 
         #fully connect layer to classify the image into the different styles
         #first fully connected layer
-		d_w8 = tf.get_variable('d_w8', [4 * 4 *512, 1024], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_w8 = tf.get_variable('d_w8', [4 * 4 * 512, 1024], initializer=tf.truncated_normal_initializer(stddev=0.02))
 		d_b8 = tf.get_variable('d_b8', [1024], initializer=tf.constant_initializer(0))
 		d8 = tf.matmul(d6, d_w8) + d_b8
 		d8 = tf.nn.leaky_relu(alpha=0.2, d8)
