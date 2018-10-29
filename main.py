@@ -6,7 +6,7 @@ import neuralnet
 import numpy as np
 
 # parameters:
-batch_size = 100
+batch_size = 10
 
 def nextBatch(num, data, labels):
     idx = np.arange(0 , len(data))
@@ -51,7 +51,8 @@ if __name__ == "__main__":
 
 	for i in range(len(samples_label)):
 		z_batch = np.random.normal(0, 1, size=[batch_size, 100])
-		image_batch = nextBatch(batch_size, samples, samples_label)
+		image_batch, x = nextBatch(batch_size, samples, samples_label)
+		# print (image_batch.shape)
 		# train discriminator	
 		_, __, dLossReal, dLossFake = sess.run([Optimize_function_real, Optimize_function_fake, discriminator_loss_real, discriminator_loss_fake],{x_placeholder: image_batch, z_placeholder: z_batch})
 
