@@ -1,10 +1,10 @@
 from operations import *
 import tensorflow as tf
 
-def discriminator(image, reuse_variables = None):
+def discriminator(images, reuse_variables = None):
 	with tf.variable_scope("discriminator", reuse=reuse_variables) as scope:
 		#conv 1 (32 4x4 filters)
-		d1 = conv2d(image, [4, 4, 3, 32], 'd1')
+		d1 = conv2d(images, [4, 4, 3, 32], 'd1')
 		d1 = batch_norm(d1)
 		d1 = tf.nn.leaky_relu(alpha=0.2, features = d1)
 
@@ -36,7 +36,7 @@ def discriminator(image, reuse_variables = None):
 		d6 = tf.reshape(d6, [-1, 4 * 4 * 512])
 		#fully connected layer to determine whether the image is real or fake
 		d7 = fully_connected(d6, 4 * 4 * 512, 1, 'd7')
-		d7 = tf.nn.leaky_relu(features =d7)
+		d7 = tf.nn.leaky_relu(features = d7)
 
         #fully connect layer to classify the image into the different styles
         #first fully connected layer
@@ -55,11 +55,11 @@ def discriminator(image, reuse_variables = None):
 
 def generator(z):
 	with tf.variable_scope("generator") as scope:
-		g_w0 = tf.get_variable('g_w1', [100, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		g_b0 = tf.get_variable('g_b1', [4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_w0 = tf.get_variable('g_w0', [100, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_b0 = tf.get_variable('g_b0', [4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 
 		#project and reshape
-		g0 = tf.matmul(z, g_w0) + g_w0
+		g0 = tf.matmul(z, g_w0) + g_b0
 		g0 = tf.reshape(g0, [-1, 4, 4, 1024])
 		g0 = batch_norm(g0)
 		g0 = tf.nn.relu(g0)

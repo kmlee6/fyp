@@ -24,7 +24,7 @@ def init_style_dict(path): #path = './data/**/'
 	label_dict = {}
 	style_folders = glob(path, recursive=True)[1:]
 	for index, path in enumerate(style_folders):
-		print(path[7:-1])
+		# print(path[7:-1])
 		label_dict[path[7:-1]] = index
 	return label_dict
 

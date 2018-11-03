@@ -1,6 +1,4 @@
 import tensorflow as tf
-# import discriminator
-# import generator
 from utils import *
 import neuralnet
 import numpy as np
@@ -14,7 +12,6 @@ def nextBatch(num, data, labels):
     idx = idx[:num]
     data_shuffle = [data[i] for i in idx]
     labels_shuffle = [labels[i] for i in idx]
-
     return np.asarray(data_shuffle), np.asarray(labels_shuffle)
 
 if __name__ == "__main__":
@@ -38,7 +35,7 @@ if __name__ == "__main__":
 	discriminator_loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = discriminator_fake, labels = tf.zeros_like(discriminator_fake)))
 	generator_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = discriminator_fake, labels = tf.ones_like(discriminator_fake)))
 	
-	# define variable for the models
+	# initialize the variables for the models	
 	t_vars = tf.trainable_variables()
 	d_vars = [var for var in t_vars if 'discriminator' in var.name]
 	g_vars = [var for var in t_vars if 'generator' in var.name]
@@ -48,13 +45,13 @@ if __name__ == "__main__":
 
 	tf.get_variable_scope().reuse_variables()
 	sess = tf.Session()
-
+	sess.run(tf.global_variables_initializer())
 	for i in range(len(samples_label)):
 		z_batch = np.random.normal(0, 1, size=[batch_size, 100])
 		image_batch, x = nextBatch(batch_size, samples, samples_label)
 		# print (image_batch.shape)
 		# train discriminator	
-		_, __, dLossReal, dLossFake = sess.run([Optimize_function_real, Optimize_function_fake, discriminator_loss_real, discriminator_loss_fake],{x_placeholder: image_batch, z_placeholder: z_batch})
+		sess.run([Optimize_function_real, Optimize_function_fake],{x_placeholder: image_batch, z_placeholder: z_batch})
 
 		# train generator
 		z_batch = np.random.normal(0, 1, size=[batch_size, 100])
