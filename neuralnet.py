@@ -36,7 +36,7 @@ def discriminator(images, reuse_variables = None):
 		d6 = tf.reshape(d6, [-1, 4 * 4 * 512])
 		#fully connected layer to determine whether the image is real or fake
 		d7 = fully_connected(d6, 4 * 4 * 512, 1, 'd7')
-		d7 = tf.nn.leaky_relu(features = d7)
+		d7 = tf.nn.sigmoid(d7)
 
         #fully connect layer to classify the image into the different styles
         #first fully connected layer
@@ -49,43 +49,44 @@ def discriminator(images, reuse_variables = None):
 
 		#third fully connected layer
 		d10 = fully_connected(d9, 512, 3, 'd10')
-		d10 = tf.nn.leaky_relu(features =d10)
+		d10 = tf.nn.softmax(d10)
 
 		return d7, d10
 
-def generator(z):
+def generator(batch_size, z):
 	with tf.variable_scope("generator") as scope:
 		g_w0 = tf.get_variable('g_w0', [100, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b0 = tf.get_variable('g_b0', [4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 
 		#project and reshape
 		g0 = tf.matmul(z, g_w0) + g_b0
-		g0 = tf.reshape(g0, [-1, 4, 4, 1024])
+		g0 = tf.reshape(g0, [batch_size, 4, 4, 1024])
 		g0 = batch_norm(g0)
 		g0 = tf.nn.relu(g0)
 
 		#fsconv1
-		g1 = fsconv2d(g0, [-1, 8, 8, 1024], 'g1')
+		g1 = fsconv2d(g0, [batch_size, 8, 8, 1024], 'g1')
 		g1 = batch_norm(g1)
 		g1 = relu(g1)
+
 		#fsconv2
-		g2 = fsconv2d(g1, [-1, 16, 16, 512], 'g2')
+		g2 = fsconv2d(g1, [batch_size, 16, 16, 512], 'g2')
 		g2 = batch_norm(g2)
 		g2 = relu(g2)
 		#fsconv3
-		g3 = fsconv2d(g2, [-1, 32, 32, 256], 'g3')
+		g3 = fsconv2d(g2, [batch_size, 32, 32, 256], 'g3')
 		g3 = batch_norm(g3)
 		g3 = relu(g3)
 		#fsconv4
-		g4 = fsconv2d(g3, [-1, 64, 64, 128], 'g4')
+		g4 = fsconv2d(g3, [batch_size, 64, 64, 128], 'g4')
 		g4 = batch_norm(g4)
 		g4 = relu(g4)
 		#fsconv5
-		g5 = fsconv2d(g4, [-1, 128, 128, 64], 'g5')
+		g5 = fsconv2d(g4, [batch_size, 128, 128, 64], 'g5')
 		g5 = batch_norm(g5)
 		g5 = relu(g5)
 		#fsconv6
-		g6 = fsconv2d(g5, [-1, 256, 256, 3], 'g6')
+		g6 = fsconv2d(g5, [batch_size, 256, 256, 3], 'g6')
 		g6 = batch_norm(g6)
 		g6 = relu(g6)
 
