@@ -53,8 +53,8 @@ def discriminator(images, reuse_variables = None):
 
 		return d7, d10
 
-def generator(batch_size, z):
-	with tf.variable_scope("generator") as scope:
+def generator(batch_size, z, reuse_variables = None):
+	with tf.variable_scope("generator", reuse=reuse_variables) as scope:
 		g_w0 = tf.get_variable('g_w0', [100, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b0 = tf.get_variable('g_b0', [4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 

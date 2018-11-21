@@ -1,9 +1,11 @@
 import neuralnet
 import tensorflow as tf
+from config import *
 
-def loss(batch_size, images, image_labels, noise):
+def loss(images, image_labels, noise):
 	# define input for each model
 	g_ = neuralnet.generator(batch_size, noise)
+	sampler_ = neuralnet.generator(4, noise, reuse_variables = True)
 	d_real, d_real_c = neuralnet.discriminator(images)
 	d_fake, d_fake_c = neuralnet.discriminator(g_, reuse_variables = True)
 
@@ -15,7 +17,7 @@ def loss(batch_size, images, image_labels, noise):
 	d_fake_detect = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake, labels = tf.zeros_like(d_fake)))
 
 	real_c = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_real_c, labels = image_labels))
-	fake_c = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake_c, labels = (1.0/3) * tf.ones_like(d_fake_c)))# 1 / num of class
+	fake_c = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake_c, labels = (1.0/ class_) * tf.ones_like(d_fake_c)))# 1 / num of class
 
 	g_fake_detect = -tf.reduce_mean(tf.log(d_fake))
 
@@ -27,9 +29,9 @@ def loss(batch_size, images, image_labels, noise):
 	d_vars = [var for var in t_vars if 'discriminator' in var.name]
 	g_vars = [var for var in t_vars if 'generator' in var.name]
 
-	d_opt = tf.train.AdamOptimizer(learning_rate=0.0003, beta1=0.5).minimize(d_loss, var_list=d_vars)
-	g_opt = tf.train.AdamOptimizer(learning_rate=0.0003, beta1=0.5).minimize(g_loss, var_list=g_vars)
+	d_opt = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.5).minimize(d_loss, var_list=d_vars)
+	g_opt = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.5).minimize(g_loss, var_list=g_vars)
 
 	tf.get_variable_scope().reuse_variables()
 
-	return d_opt, g_opt, [d_loss, g_loss, d_fake, d_real_c], accuracy
+	return d_opt, g_opt, sampler_, [d_real, d_fake], correct_prediction
