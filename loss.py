@@ -7,14 +7,19 @@ def loss(images, image_labels, noise):
 	g_ = neuralnet.generator(batch_size, noise)
 	sampler_ = neuralnet.generator(4, noise, reuse_variables = True)
 	d_real_logits, d_real, d_real_c_logits, d_real_c = neuralnet.discriminator(images)
-	d_fake_logits, d_fake, d_fake_c_logits, d_fake_c = neuralnet.discriminator(g_, reuse_variables = True)
+
+	g_with_noise = g_ + tf.random_normal(shape=tf.shape(g_), mean=0.0, stddev=0.1)
+	d_fake_logits, d_fake, d_fake_c_logits, d_fake_c = neuralnet.discriminator(g_with_noise, reuse_variables = True)
 
 	correct_prediction = tf.equal(tf.argmax(image_labels,1), tf.argmax(d_real_c,1))
 	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+	true_label = tf.random_uniform(tf.shape(d_real),.8, 1.2)
+	false_label = tf.random_uniform(tf.shape(d_fake), 0.0, 0.3)
+
 	#define loss functions
-	real_detect = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_real_logits, labels = tf.ones_like(d_real)))
-	d_fake_detect = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake_logits, labels = tf.zeros_like(d_fake)))
+	real_detect = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_real_logits, labels = true_label*tf.ones_like(d_real)))
+	d_fake_detect = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake_logits, labels = false_label*tf.ones_like(d_fake)))
 
 	real_c = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_real_c_logits, labels = image_labels))
 	fake_c = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = d_fake_c_logits, labels = (1.0/ class_) * tf.ones_like(d_fake_c)))# 1 / num of class
@@ -35,8 +40,8 @@ def loss(images, image_labels, noise):
 	d_vars = [var for var in t_vars if 'discriminator' in var.name]
 	g_vars = [var for var in t_vars if 'generator' in var.name]
 
-	d_opt = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.5).minimize(d_loss, var_list=d_vars)
-	g_opt = tf.train.AdamOptimizer(learning_rate=0.00005, beta1=0.5).minimize(g_loss, var_list=g_vars)
+	d_opt = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.4).minimize(d_loss, var_list=d_vars)
+	g_opt = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.4).minimize(g_loss, var_list=g_vars)
 
 	tf.get_variable_scope().reuse_variables()
 

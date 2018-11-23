@@ -69,14 +69,14 @@ if __name__ == "__main__":
 
 	# define placeholder
 	images = tf.placeholder(tf.float32, shape = [None,256,256,3], name='x_placeholder') #input images
-	image_labels = tf.placeholder(tf.float32, shape = [None, 3], name='y_placeholder') #class labels
+	image_labels = tf.placeholder(tf.float32, shape = [None, class_], name='y_placeholder') #class labels
 	noise = tf.placeholder(tf.float32, [None, 100], name='z_placeholder') #noise for generator
 
 	d_opt, g_opt, sampler_, monitor, merged = loss(images, image_labels, noise)
 	saver = tf.train.Saver()
 
 	sess.run(tf.global_variables_initializer())
-	# saver.restore(sess, model_path+"model_200.ckpt")
+	# saver.restore(sess, model_path+"model_450.ckpt")
 
 	train_writer = tf.summary.FileWriter(log_path, sess.graph)
 
@@ -88,22 +88,25 @@ if __name__ == "__main__":
 		z_batch = np.random.normal(0, 1, size=[batch_size, 100])
 		# image_batch, labels = nextBatch(pool_sample, pool_label)
 		image_batch, labels = nextBatch(samples_path, samples_label)
-		print(len(image_batch))
-		print("Epoch {}".format(i))
+		print("Iteration {}".format(i))
 		# print(labels)
 		# train discriminator	
 		sess.run([d_opt, g_opt],{images: image_batch, image_labels: labels, noise: z_batch})
-		z_batch = np.random.normal(0, 1, size=[batch_size, 100])
 
-		mon_0, mon_1 = sess.run([monitor[0], monitor[1]], feed_dict={images: image_batch, image_labels: labels, noise: z_batch})
-		print("D-{}\n==\n{}".format(mon_0, mon_1))
-
+		# z_batch = np.random.normal(0, 1, size=[batch_size, 100])
+		# mon_= sess.run([g_opt], feed_dict={noise: z_batch})
 		if(i%10==0):
 			summary_ = sess.run(merged, feed_dict={images: image_batch, image_labels: labels, noise: z_batch})
 			train_writer.add_summary(summary_, i)
-		if(i%50==0):
+		if(i%30==0):
+			z_batch = np.random.normal(0, 1, size=[batch_size, 100])
+			mon_0, mon_1 = sess.run([monitor[0], monitor[1]], feed_dict={images: image_batch, image_labels: labels, noise: z_batch})
+			print(mon_0)
+			print("**************")
+			print(mon_1)
 			sample_batch = np.random.normal(0, 1, size=[4, 100])
 			output_ = sess.run(sampler_, feed_dict={noise: sample_batch})
 			output_ = np.array(output_)
 			save_images(output_, (2,2), '{}/sample_{}.jpg'.format(experiment_path, i))
+		if(i%50==0):
 			save_path = saver.save(sess, "{}/model_{}.ckpt".format(model_path, i))

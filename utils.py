@@ -8,20 +8,24 @@ import scipy
 from glob import glob
 import numpy as np
 from skimage import transform
+from config import *
 # import imageio
 
 
 def transform_image(path):
-	print("reading {}".format(path))
+	# print("reading {}".format(path))
 	# removed in v1.1
 	image = scipy.misc.imread(path).astype(np.float)
-	cropped_image = scipy.misc.imresize(image, [256, 256])
+	return np.array(image)/127.5 - 1
+	# cropped_image = scipy.misc.imresize(image, [256, 256])
 	# image = imageio.imread(path, as_gray=False) 
 	# cropped_image = transform.resize(image, (256,256), preserve_range=True, mode='constant')
-	return np.array(cropped_image)/127.5 - 1 #normalization
+	# return np.array(cropped_image)/127.5 - 1 #normalization
 
 def inverse_transform_image(data):
-	return np.array(((data+1.) * 127.5 ) %255, dtype='uint8')
+	data = np.clip(data, -1, 1)
+	output = np.array((data+1.) * 127.5, dtype='uint8')
+	return output
 
 def merge_images(images, size):
 	heigh, width = images.shape[1], images.shape[2]
@@ -55,7 +59,7 @@ def get_images_label(images_path, label_dict):
 	ret = []
 	for path in images_path:
 		label_str = path.split('/')
-		ret.append(np.eye(3)[np.array(label_dict[label_str[-2]])])
+		ret.append(np.eye(class_)[np.array(label_dict[label_str[-2]])])
 	return ret
 
 def save_images(images, size, images_path):

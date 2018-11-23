@@ -1,4 +1,5 @@
 from operations import *
+from config import *
 import tensorflow as tf
 
 def discriminator(images, reuse_variables = None):
@@ -48,7 +49,7 @@ def discriminator(images, reuse_variables = None):
 		d9 = tf.nn.leaky_relu(alpha=0.2, features =d9)
 
 		#third fully connected layer
-		d10 = fully_connected(d9, 512, 3, 'd10')
+		d10 = fully_connected(d9, 512, class_, 'd10')
 		d10_ = tf.nn.softmax(d10)
 
 		return d7, d7_, d10, d10_
