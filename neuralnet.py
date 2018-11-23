@@ -36,7 +36,7 @@ def discriminator(images, reuse_variables = None):
 		d6 = tf.reshape(d6, [-1, 4 * 4 * 512])
 		#fully connected layer to determine whether the image is real or fake
 		d7 = fully_connected(d6, 4 * 4 * 512, 1, 'd7')
-		d7 = tf.nn.sigmoid(d7)
+		d7_ = tf.nn.sigmoid(d7)
 
         #fully connect layer to classify the image into the different styles
         #first fully connected layer
@@ -49,9 +49,9 @@ def discriminator(images, reuse_variables = None):
 
 		#third fully connected layer
 		d10 = fully_connected(d9, 512, 3, 'd10')
-		d10 = tf.nn.softmax(d10)
+		d10_ = tf.nn.softmax(d10)
 
-		return d7, d10
+		return d7, d7_, d10, d10_
 
 def generator(batch_size, z, reuse_variables = None):
 	with tf.variable_scope("generator", reuse=reuse_variables) as scope:

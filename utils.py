@@ -12,6 +12,7 @@ from skimage import transform
 
 
 def transform_image(path):
+	print("reading {}".format(path))
 	# removed in v1.1
 	image = scipy.misc.imread(path).astype(np.float)
 	cropped_image = scipy.misc.imresize(image, [256, 256])
@@ -25,7 +26,6 @@ def inverse_transform_image(data):
 def merge_images(images, size):
 	heigh, width = images.shape[1], images.shape[2]
 	img = np.zeros((heigh * size[0], width * size[1], 3))
-	print("haha")
 	for index, image in enumerate(images):
 		i = index% size[1]
 		j = index // size[1]
@@ -38,10 +38,8 @@ def init_style_dict(path): #path = './data/**/'
 	label_dict = {}
 	style_folders = glob(path, recursive=True)[1:]
 	for index, path in enumerate(style_folders):
-		# print(path[7:-1])
 		class_name = path.split('/')[-2]
 		label_dict[class_name] = index
-	print('{{Style dictionary:}}')
 	print(label_dict)
 	return label_dict
 
@@ -56,8 +54,8 @@ def get_images(sample_files):
 def get_images_label(images_path, label_dict):
 	ret = []
 	for path in images_path:
-		_, _, label_str, _ = path.split('/', 3)
-		ret.append(np.eye(3)[np.array(label_dict[label_str])])
+		label_str = path.split('/')
+		ret.append(np.eye(3)[np.array(label_dict[label_str[-2]])])
 	return ret
 
 def save_images(images, size, images_path):
